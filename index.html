@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>24-HR Streamer</title>
+    <script src="1.js"></script>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #080808;
+            color: white;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            height: 70px;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #e50914;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #ddd;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-box input {
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 9px 12px;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .search-box button {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+
+        /* HERO */
+
+        .hero {
+            height: 620px;
+            display: flex;
+            align-items: center;
+            padding-left: 7%;
+            position: relative;
+            background:
+                linear-gradient(90deg, #080808 10%, rgba(8,8,8,.75), rgba(8,8,8,.15)),
+                linear-gradient(0deg, #080808, transparent 40%),
+                url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=80");
+
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-content h1 {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .hero-content h1 span {
+            color: #e50914;
+        }
+
+        .hero-info {
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .hero-description {
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .watch-btn,
+        .list-btn {
+            padding: 13px 23px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .watch-btn {
+            background: white;
+            color: black;
+        }
+
+        .watch-btn:hover {
+            background: #ddd;
+        }
+
+        .list-btn {
+            background: #444;
+            color: white;
+        }
+
+        .list-btn:hover {
+            background: #555;
+        }
+
+
+        /* CONTENT */
+
+        .content {
+            padding: 20px 5%;
+        }
+
+        .section-title {
+            margin: 35px 0 18px;
+            font-size: 25px;
+        }
+
+        .movie-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .movie {
+            background: #151515;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .movie:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0,0,0,.7);
+        }
+
+        .movie img {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 12px;
+        }
+
+        .movie-info h3 {
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+
+        .movie-info p {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .rating {
+            color: #ffd700;
+            margin-top: 7px;
+            font-size: 13px;
+        }
+
+
+        /* GENRES */
+
+        .genres {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .genre {
+            background: #222;
+            padding: 12px 22px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .genre:hover {
+            background: #e50914;
+        }
+
+
+        /* FOOTER */
+
+        footer {
+            margin-top: 70px;
+            padding: 40px 7%;
+            background: #111;
+            color: #888;
+        }
+
+        footer h2 {
+            color: #e50914;
+            margin-bottom: 15px;
+        }
+
+        footer p {
+            margin: 8px 0;
+        }
+
+
+        /* MODAL */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.9);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            width: 80%;
+            max-width: 900px;
+            background: #111;
+            padding: 25px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .video {
+            width: 100%;
+            height: 450px;
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin-top: 20px;
+        }
+
+
+        /* RESPONSIVE */
+
+        @media(max-width: 1000px) {
+
+            .movie-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+        }
+
+        @media(max-width: 650px) {
+
+            .search-box {
+                display: none;
+            }
+
+            .hero {
+                height: 550px;
+                padding: 20px;
+            }
+
+            .hero-content h1 {
+                font-size: 40px;
+            }
+
+            .movie-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .movie img {
+                height: 240px;
+            }
+
+            .video {
+                height: 250px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<nav>
+
+    <div class="logo">
+        24-HR <span>STREAMER</span>
+    </div>
+
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#movies">Movies</a>
+        <a href="#series">Series</a>
+        <a href="#genres">Genres</a>
+        <a href="#">My List</a>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="search" placeholder="Search...">
+        <button onclick="searchMovies()">Search</button>
+    </div>
+
+</nav>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            Enter the world of
+            <span>24-HR</span>
+        </h1>
+
+        <div class="hero-info">
+            ⭐ 9.2 &nbsp; | &nbsp; 2026 &nbsp; | &nbsp; 2h 18m
+        </div>
+
+        <p class="hero-description">
+            Discover movies, series and unforgettable stories.
+            Stream your favorite entertainment anytime,
+            anywhere with 24-HR Streamer.
+        </p>
+
+        <div class="buttons">
+
+            <button class="watch-btn"
+                    onclick="openPlayer('Featured Movie')">
+                ▶ Watch Now
+            </button>
+
+            <button class="list-btn"
+                    onclick="addToList('Featured Movie')">
+                + My List
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- MAIN -->
+
+<main class="content">
+
+
+    <!-- TRENDING -->
+
+    <h2 class="section-title">
+        🔥 Trending Now
+    </h2>
+
+    <div class="movie-container" id="movies">
+
+
+        <div class="movie" data-name="The Last Horizon"
+             onclick="openPlayer('The Last Horizon')">
+
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>The Last Horizon</h3>
+                <p>Action • Sci-Fi</p>
+                <div class="rating">⭐ 8.9</div>
+            </div>
+
+        </div>
+
+
+        <div class="movie" data-name="Dark City"
+             onclick="openPlayer('Dark City')">
+
+            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Dark City</h3>
+                <p>Thriller • Mystery</p>
+                <div class="rating">⭐ 8.7</div>
+            </div>
+
+        </div>
+
+
+        <div class="movie" data-name="The Journey"
+             onclick="openPlayer('The Journey')">
+
+            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>The Journey</h3>
+                <p>Adventure • Drama</p>
+                <div class="rating">⭐ 8.5</div>
+            </div>
+
+        </div>
+
+
+        <div class="movie" data-name="Beyond Earth"
+             onclick="openPlayer('Beyond Earth')">
+
+            <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Beyond Earth</h3>
+                <p>Sci-Fi • Adventure</p>
+                <div class="rating">⭐ 9.0</div>
+            </div>
+
+        </div>
+
+
+        <div class="movie" data-name="Night Runner"
+             onclick="openPlayer('Night Runner')">
+
+            <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Night Runner</h3>
+                <p>Action • Crime</p>
+                <div class="rating">⭐ 8.4</div>
+            </div>
+
+        </div>
+
+
+        <div class="movie" data-name="Lost World"
+             onclick="openPlayer('Lost World')">
+
+            <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Lost World</h3>
+                <p>Fantasy • Adventure</p>
+                <div class="rating">⭐ 8.8</div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CONTINUE WATCHING -->
+
+    <h2 class="section-title">
+        ▶ Continue Watching
+    </h2>
+
+    <div class="movie-container">
+
+        <div class="movie">
+            <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Midnight Story</h3>
+                <p>Episode 4 • 42 min</p>
+            </div>
+        </div>
+
+
+        <div class="movie">
+            <img src="https://images.unsplash.com/photo-1574267432644-f610f45a3d52?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Final Mission</h3>
+                <p>Episode 7 • 51 min</p>
+            </div>
+        </div>
+
+
+        <div class="movie">
+            <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>After Dark</h3>
+                <p>Episode 2 • 38 min</p>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- GENRES -->
+
+    <h2 class="section-title" id="genres">
+        Explore Genres
+    </h2>
+
+    <div class="genres">
+
+        <div class="genre">Action</div>
+        <div class="genre">Comedy</div>
+        <div class="genre">Drama</div>
+        <div class="genre">Horror</div>
+        <div class="genre">Sci-Fi</div>
+        <div class="genre">Romance</div>
+        <div class="genre">Thriller</div>
+        <div class="genre">Adventure</div>
+
+    </div>
+
+
+    <!-- POPULAR -->
+
+    <h2 class="section-title" id="series">
+        ⭐ Popular Series
+    </h2>
+
+    <div class="movie-container">
+
+        <div class="movie">
+            <img src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Shadow Files</h3>
+                <p>Crime • 3 Seasons</p>
+                <div class="rating">⭐ 9.1</div>
+            </div>
+        </div>
+
+
+        <div class="movie">
+            <img src="https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Breaking Point</h3>
+                <p>Drama • 2 Seasons</p>
+                <div class="rating">⭐ 8.9</div>
+            </div>
+        </div>
+
+
+        <div class="movie">
+            <img src="https://images.unsplash.com/photo-1485095329183-d0797cdc5676?auto=format&fit=crop&w=600&q=80">
+
+            <div class="movie-info">
+                <h3>Unknown</h3>
+                <p>Mystery • 1 Season</p>
+                <div class="rating">⭐ 8.6</div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <h2>24-HR STREAMER</h2>
+
+    <p>Unlimited entertainment. Anytime. Anywhere.</p>
+
+    <p>About &nbsp; Help Center &nbsp; Privacy &nbsp; Terms</p>
+
+    <p>© 2026 24-HR Streamer</p>
+
+</footer>
+
+
+<!-- PLAYER MODAL -->
+
+<div class="modal" id="player">
+
+    <div class="modal-content">
+
+        <span class="close" onclick="closePlayer()">×</span>
+
+        <h2 id="movieTitle">
+            Movie
+        </h2>
+
+        <div class="video">
+            ▶
+        </div>
+
+        <p style="margin-top:15px;color:#aaa;">
+            Video player preview — connect your own video source here.
+        </p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function openPlayer(movie) {
+
+        document.getElementById("movieTitle").innerText = movie;
+
+        document.getElementById("player").style.display = "flex";
+
+    }
+
+
+    function closePlayer() {
+
+        document.getElementById("player").style.display = "none";
+
+    }
+
+
+    function addToList(movie) {
+
+        alert(movie + " added to My List ❤️");
+
+    }
+
+
+    function searchMovies() {
+
+        let input =
+            document.getElementById("search").value.toLowerCase();
+
+        let movies =
+            document.querySelectorAll(".movie");
+
+        movies.forEach(function(movie) {
+
+            let name =
+                movie.getAttribute("data-name");
+
+            if(name) {
+
+                if(name.toLowerCase().includes(input)) {
+
+                    movie.style.display = "block";
+
+                } else {
+
+                    movie.style.display = "none";
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+    window.onclick = function(event) {
+
+        let modal =
+            document.getElementById("player");
+
+        if(event.target == modal) {
+
+            closePlayer();
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>
